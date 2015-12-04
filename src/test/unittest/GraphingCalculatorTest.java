@@ -2,20 +2,25 @@ package test.unittest;
 
 import static org.junit.Assert.*;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.main.Visualizer;
-import com.maths.Calculator;
+import com.maths.GraphingCalculator;
 
-public class CalculatorTest {
+public class GraphingCalculatorTest {
 	
-	Calculator calc;
+	GraphingCalculator calc;
 	
 	@Before
 	public void setUp(){
-		calc = new Calculator(Visualizer.WIDTH,Visualizer.HEIGHT);
+		BufferedImage buf = new BufferedImage(Visualizer.WIDTH,Visualizer.HEIGHT,BufferedImage.TYPE_INT_RGB);
+		Graphics2D g2d = (Graphics2D)buf.getGraphics();
+		calc = new GraphingCalculator(g2d,Visualizer.WIDTH,Visualizer.HEIGHT);
 	}
 	
 	@After

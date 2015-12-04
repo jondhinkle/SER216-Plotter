@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-	CalculatorTest.class,
+	GraphingCalculatorTest.class,
 	ColorpanelTest.class,
 	DigitTextFieldTest.class,
 	FunctionTextFieldTest.class
