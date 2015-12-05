@@ -15,6 +15,7 @@ import com.Polygon3D;
 import com.Renderer3D;
 import com.ZBuffer;
 import com.main.Visualizer;
+import com.maths.MathTree.Unit;
 
 
 public class GraphingCalculator extends Renderer3D{
@@ -40,11 +41,11 @@ public class GraphingCalculator extends Renderer3D{
 	//private ParseFunction pf;
 	private MathTree mathTree=null;
 	private double[] fun;
-	private double[] dfun;
 	private double[][] fun3D;
 	private Color derivativelinecolor = Color.RED;
 	private Graphics2D bufgraphics2D;
 	private BufferedImage buf;
+	private Unit unit = Unit.RADIANS;
 	boolean recalculate=true;
 	DecimalFormat df=new DecimalFormat("##.##");
 	private Graphics2D extgraphics2D;
@@ -72,11 +73,34 @@ public class GraphingCalculator extends Renderer3D{
 		this.buf = buf;
 	}
 	
+	public void setUnitType(Unit unit) {
+		this.unit = unit;
+	}
+	
+	public Unit getUnitType() {
+		return unit;
+	}
+	
+	public String getFunctionString() {
+		return DISPLAYED_FUNCTION;
+	}
+	
+	public void setFunctionString(String fun) {
+		DISPLAYED_FUNCTION = fun;
+		mathTree=new MathTree(DISPLAYED_FUNCTION.substring(0));
+	}
+	
+	public void setFunctionString(String fun, Unit unit) {
+		DISPLAYED_FUNCTION = fun;
+		mathTree=new MathTree(DISPLAYED_FUNCTION.substring(0));
+		this.unit = unit;
+	}
+	
 	public BufferedImage getBufferedImage() {
 		return buf;
 	}
 	
-	public double[][] getFunction(){
+	public double[][] getFunction(Unit unit){
 		
 		dx=(b-a)/(n-1);//incremento d'intervallo
 		
@@ -86,20 +110,18 @@ public class GraphingCalculator extends Renderer3D{
 		{		  
 			double x=a+k*dx;
 			ret_fun[k][0]=x;
-			ret_fun[k][1]=f(x); 
+			ret_fun[k][1]=f(x,unit); 
 		}
 		 
 		return ret_fun; 
 	}
 	
-	public double[][][] getFunction3D(){
+	public double[][][] getFunction3D(Unit unit){
 		
 		dx1=(b2-a2)/(ny-1);
 		dx0=(b-a)/(nx-1);
 		
 		double[][][] ret_fun = new double[nx][ny][3];
-		
-		mathTree=new MathTree(DISPLAYED_FUNCTION.substring(0));
 		
 		
 		for(int k=0;k<nx;k++)
@@ -110,7 +132,7 @@ public class GraphingCalculator extends Renderer3D{
 				
 				 ret_fun[k][j][0]=x;
 				 ret_fun[k][j][1]=y;
-				 ret_fun[k][j][2]=f(x,y);			
+				 ret_fun[k][j][2]=f(x,y,unit);			
 			} 	
 		}
 		
@@ -138,31 +160,28 @@ public class GraphingCalculator extends Renderer3D{
 		drawYAxis();
 	}
 	
-	private void drawToExternalGraphics2D(){
+	protected void drawToExternalGraphics2D(){
 		extgraphics2D.drawImage(buf,0,0,getGraphicWidth(),getGraphicHeight(),null);
 	}
 	
 	public Graphics2D getg2d(){return bufgraphics2D;}
 	
-	public void draw() {
+	public void draw(Unit unit) {
 		init2DGraphic();
 		bufgraphics2D.setColor(getLineColor());
 		dx=(b-a)/(n-1);//incremento d'intervallo
-		mathTree=new MathTree(DISPLAYED_FUNCTION.substring(0));
 		if(recalculate)
-		 fun=calculateFunction();
+		 fun=calculateFunction(unit);
 		plotFunction(fun);
 		drawToExternalGraphics2D();
 	}
 	
-	public void draw3D() {
+	public void draw3D(Unit unit) {
 		
 		dx1=(b2-a2)/(ny-1);
 		dx0=(b-a)/(nx-1);
 		
-		mathTree=new MathTree(DISPLAYED_FUNCTION.substring(0));
-		
-		if(recalculate) fun3D=calculateFunction3D();
+		if(recalculate) fun3D=calculateFunction3D(unit);
 		
 		plotFunction3D(fun3D);
 		drawToExternalGraphics2D();
@@ -261,19 +280,19 @@ public class GraphingCalculator extends Renderer3D{
 		
 	}
 
-	private double[] calculateFunction() {
+	private double[] calculateFunction(Unit unittype) {
 		double[] ret_fun = new double[n];
 		
 		
 		for(int k=0;k<n;k++)
 		{		  
 			double x=a+k*dx;
-			ret_fun[k]=f(x); 
+			ret_fun[k]=f(x,unittype); 
 		}
 		return ret_fun;
 	}
 	
-	private double[][] calculateFunction3D() {
+	private double[][] calculateFunction3D(Unit unittype) {
 		double[][] ret_fun = new double[nx][ny];
 		
 		
@@ -282,20 +301,8 @@ public class GraphingCalculator extends Renderer3D{
 			double x=a+k*dx0;
 			for(int j=0;j<ny;j++){
 				double y=a2+j*dx1;
-				  ret_fun[k][j]=f(x,y);			
+				  ret_fun[k][j]=f(x,y,unittype);			
 			} 	
-		}
-		return ret_fun;
-	}
-	
-	private double[] calculateDerivativeFunction() {
-		double[] ret_fun = new double[n];
-		
-		
-		for(int k=0;k<n;k++)
-		{		  
-			double x=a+k*dx;
-			ret_fun[k]=AdvancedGraphingCalculator.df(x,this); 
 		}
 		return ret_fun;
 	}
@@ -309,9 +316,9 @@ public class GraphingCalculator extends Renderer3D{
 		init2DGraphic();
 		bufgraphics2D.setColor(getLineColor());
 		dx=(b-a)/(n-1);//incremento d'intervallo
-		mathTree=new MathTree(DISPLAYED_FUNCTION.substring(0));
+
 		if(recalculate)
-			 fun=calculateFunction();
+			 fun=calculateFunction(Unit.RADIANS);
 		//deltay=deltax=i*1.0/n;
 		
 		for(int k=0;k<n;k++)
@@ -331,37 +338,7 @@ public class GraphingCalculator extends Renderer3D{
 	}
 	
 	
-	public void drawDerivative(boolean donotredrawgraphic) {
-		int width = getGraphicWidth();
-		int height = getGraphicHeight();
-		if(!donotredrawgraphic){
-			init2DGraphic();
-		}
-		bufgraphics2D.setColor(derivativelinecolor);
-		dx=(b-a)/n;//incremento d'intervallo
-		mathTree=new MathTree(DISPLAYED_FUNCTION.substring(0));
-		
-		if(recalculate)
-			 dfun=calculateDerivativeFunction();
-		
-		//deltay=deltax=i*1.0/n;
-		
-			for(int k=0;k<n;k++)
-			  {
-			  
-				double x=a+k*dx;
-				double y=dfun[k];
-				
-				int cx=(int)(x/deltax)+x0;
-				int cy=(int)(y/deltay)+y0;
-			  	
-				if(cy<height && cx<width && cx>=0 && cy>=0)
-					bufgraphics2D.drawOval(cx,height-cy,1,1);
-			  } 
-		
-		  	  
-		drawToExternalGraphics2D();
-	}
+
 	
 	/**
 	 * @param bufgraphics2D
@@ -466,7 +443,7 @@ public class GraphingCalculator extends Renderer3D{
 	public String DISPLAYED_FUNCTION="sin(x)";
 	
 	
-	public double f(double x) {
+	public double f(double x, Unit unit) {
 		
 		
 		
@@ -484,7 +461,7 @@ public class GraphingCalculator extends Renderer3D{
 		
 		double val=0;
 		
-		val=mathTree.evaluate(x, 0);
+		val=mathTree.evaluate(x, 0, unit);
 		
 		
 
@@ -493,24 +470,19 @@ public class GraphingCalculator extends Renderer3D{
 		//return (Math.sin(x));
 	}
 	
-		public double f(double x,double y) {
-		
-		
+		public double f(double x,double y, Unit unit) {
 		
 		String sx=MathTree.formatVal(x);
 		String sy=MathTree.formatVal(y);
-				  
 		
 		/*sfunction=sfunction.replaceAll("exp","esp");
 		sfunction=sfunction.replaceAll("x",sx);
 		sfunction=sfunction.replaceAll("y",sy);
 		sfunction=sfunction.replaceAll("esp","exp");*/
 		
-		
-		
 		double val=0;
 		
-		val=mathTree.evaluate(x, y);
+		val=mathTree.evaluate(x, y, unit);
 		
 		
 
@@ -533,8 +505,6 @@ public class GraphingCalculator extends Renderer3D{
 		} 
 		deltay=deltax;
 	}
-
-
 
 	/**
 	 * 
@@ -564,7 +534,6 @@ public class GraphingCalculator extends Renderer3D{
 	public void moveCenter(int dx, int dy) {
 		x0+=dx;
 		y0+=dy;
-		
 	}
 
 
@@ -586,12 +555,4 @@ public class GraphingCalculator extends Renderer3D{
 	  		  	
 	  	return df.format((x-x0)*deltax);
 	}
-
-
-
-
-
-
-
-
 }

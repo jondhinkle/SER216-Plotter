@@ -206,7 +206,7 @@ public class Colorpanel extends JDialog implements ActionListener{
 	
 	public static Color buildColor(String colorString) {
 		
-		if(colorString==null) return null;
+		if(colorString==null) throw new NullPointerException();
 		Color tcc=null;
 		String[] colorComponents = colorString.split(",");
 		tcc=new Color(Integer.parseInt(colorComponents[0]),Integer.parseInt(colorComponents[1]),Integer.parseInt(colorComponents[2]));

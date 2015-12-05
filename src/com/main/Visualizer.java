@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -22,6 +24,7 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -31,21 +34,25 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.RepaintManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import com.maths.GraphingCalculator;
+import com.maths.AdvancedGraphingCalculator;
+import com.maths.MathTree;
+import com.maths.MathTree.Unit;
 
 
 public class Visualizer extends JFrame implements ActionListener,KeyListener,
-    MenuListener,MouseListener,MouseWheelListener,MouseMotionListener, FocusListener{
+    MenuListener,MouseListener,MouseWheelListener,MouseMotionListener, FocusListener, ItemListener{
 	
 	public static int CARTESIAN2D_STATE=0;
 	public static int CARTESIAN3D_STATE=2;
 	public static int POLAR2D_STATE=1;
 	public static int VISUALIZATION_STATE=CARTESIAN2D_STATE;
+	private static Unit unit = Unit.RADIANS;
 	//public static int VISUALIZATION_STATE=POLAR2D_STATE;
 	
 	String VERSION="Math graphics 2.0.1 ";
@@ -61,7 +68,7 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 	//size of the diplay panel
 	public static int HEIGHT=500;
 	public static int WIDTH=800;
-	private GraphingCalculator calc;
+	private AdvancedGraphingCalculator calc;
 	
 	public static int BUTTOMBORDER=100;
 	public static int UPBORDER=40;
@@ -81,6 +88,8 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 	public static Color PANEL_COLOR=new Color(	205,190,112);
 	private JButton displayDerivative;
 	public static boolean isDerivativeDisplay;
+	private JRadioButton degreesradio;
+	private JRadioButton radiansradio;
 	private JMenuBar jmb;
 	private JMenuItem jmt1;
 	private JMenuItem jmt3;
@@ -154,7 +163,7 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 
 	public void initialize(){
 		setVisible(true);
-		calc=new GraphingCalculator((Graphics2D)center.getGraphics(),WIDTH,HEIGHT);
+		calc=new AdvancedGraphingCalculator((Graphics2D)center.getGraphics(),WIDTH,HEIGHT);
 		calc.setY0(250);
 		calc.setX0(50);
 		if(VISUALIZATION_STATE==CARTESIAN2D_STATE)
@@ -321,9 +330,22 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		displayedFunction.addFocusListener(this);
 		
 		up.add(displayedFunction);
-		displayedFunction.setText(calc.DISPLAYED_FUNCTION);
+		displayedFunction.setText(calc.getFunctionString());
 		
-		
+		unit = Unit.RADIANS;
+		ButtonGroup unitgroup = new ButtonGroup();
+		radiansradio = new JRadioButton("Radians",true);
+		degreesradio = new JRadioButton("Degrees");
+		radiansradio.setBounds(550,5,130,15);
+		degreesradio.setBounds(550,20,130,15);
+		unitgroup.add(radiansradio);
+		unitgroup.add(degreesradio);
+		up.add(radiansradio);
+		up.add(degreesradio);
+		radiansradio.setBackground(PANEL_COLOR);
+		degreesradio.setBackground(PANEL_COLOR);
+		radiansradio.addItemListener(this);
+		degreesradio.addItemListener(this);
 		
 	}
 	
@@ -348,7 +370,7 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 			displayedFunction.addFocusListener(this);
 			up.add(displayedFunction);
 			
-			displayedFunction.setText(calc.DISPLAYED_FUNCTION);
+			displayedFunction.setText(calc.getFunctionString());
 		
 		
 		
@@ -375,9 +397,22 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 			displayedFunction.addFocusListener(this);
 			
 			up.add(displayedFunction);
-			displayedFunction.setText(calc.DISPLAYED_FUNCTION);
+			displayedFunction.setText(calc.getFunctionString());
 			
-			
+			unit = Unit.RADIANS;
+			ButtonGroup unitgroup = new ButtonGroup();
+			radiansradio = new JRadioButton("Radians",true);
+			degreesradio = new JRadioButton("Degrees");
+			radiansradio.setBounds(550,5,130,15);
+			degreesradio.setBounds(550,20,130,15);
+			unitgroup.add(radiansradio);
+			unitgroup.add(degreesradio);
+			up.add(radiansradio);
+			up.add(degreesradio);
+			radiansradio.setBackground(PANEL_COLOR);
+			degreesradio.setBackground(PANEL_COLOR);
+			radiansradio.addItemListener(this);
+			degreesradio.addItemListener(this);
 			
 		}
 		
@@ -544,13 +579,13 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 			calc.setDerivativeColor(LINE_2_COLOR);
 			
 			if(VISUALIZATION_STATE==CARTESIAN2D_STATE){
-				calc.draw();
-				if(isDerivativeDisplay){
-					calc.drawDerivative(true);
+				calc.draw(unit);
+				if(isDerivativeDisplay && unit != Unit.DEGREES){
+					calc.drawDerivative();
 				}
 			}
 			else if(VISUALIZATION_STATE==CARTESIAN3D_STATE){
-				calc.draw3D();
+				calc.draw3D(unit);
 			}
 			else if(VISUALIZATION_STATE==POLAR2D_STATE){
 				calc.drawPolar();
@@ -585,7 +620,7 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 			
 		}
 		
-		calc.DISPLAYED_FUNCTION=displayedFunction.getText();
+		calc.setFunctionString(displayedFunction.getText());
 		draw.requestFocus(true);
 	}
 
@@ -650,7 +685,6 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 			zoom(-1);
 		}
 		else if (o==calculateIntegral ||o==jmt3){
-			
 			calculateIntegral();
 		}
 		else if (o==displayDerivative || o==jmt4){
@@ -671,16 +705,21 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		else if (o==jmt1) exit();
 		else if(o==jmt21) {
 			VISUALIZATION_STATE=CARTESIAN2D_STATE;
-			calc.DISPLAYED_FUNCTION="sin(x)";
+			calc.setFunctionString("sin(x)");
 			calc.setY0(250);
 			calc.setX0(50);
-			displayedFunction.setText(calc.DISPLAYED_FUNCTION);
+			displayedFunction.setText(calc.getFunctionString());
 			remove(up);
 			remove(right);
 			buildUpPanel();
 			buildRightPanel();
 			jmt3.setVisible(true);
 			jmt4.setVisible(true);
+			if(unit == Unit.DEGREES){
+				jmt4.setVisible(false);
+				displayDerivative.setVisible(false);
+				calculateIntegral.setVisible(false);
+			}
 			setColors(p);
 			repaint();
 			
@@ -688,10 +727,10 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		}
 		else if(o==jmt22) {
 			VISUALIZATION_STATE=POLAR2D_STATE;	
-			calc.DISPLAYED_FUNCTION="2";
+			calc.setFunctionString("2");
 			calc.setY0(250);
 			calc.setX0(250);
-			displayedFunction.setText(calc.DISPLAYED_FUNCTION);
+			displayedFunction.setText(calc.getFunctionString());
 			remove(up);
 			remove(right);
 			buildPolarUpPanel();
@@ -703,16 +742,20 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		}
 		else if(o==jmt23) {
 			VISUALIZATION_STATE=CARTESIAN3D_STATE;	
-			calc.DISPLAYED_FUNCTION="sin(x+y)";
+			calc.setFunctionString("sin(x+y)");
 			calc.setY0(250);
 			calc.setX0(250);
-			displayedFunction.setText(calc.DISPLAYED_FUNCTION);
+			displayedFunction.setText(calc.getFunctionString());
 			remove(up);
 			remove(right);
 			build3DUpPanel();
 			build3DRightPanel();
 			jmt3.setVisible(false);
 			jmt4.setVisible(false);
+			if(unit == Unit.DEGREES){
+				displayDerivative.setVisible(false);
+				calculateIntegral.setVisible(false);
+			}
 			setColors(p);
 			repaint();
 		}
@@ -783,11 +826,11 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		Object fun=null;
 		
 		if(VISUALIZATION_STATE==CARTESIAN2D_STATE || VISUALIZATION_STATE==POLAR2D_STATE){
-			fun=calc.getFunction();
+			fun=calc.getFunction(unit);
 		}
 		else if(VISUALIZATION_STATE==CARTESIAN3D_STATE){
 			
-			fun=calc.getFunction3D();
+			fun=calc.getFunction3D(unit);
 			
 		}
 		
@@ -950,7 +993,17 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		WIDTH = width;
 	}
 
-
+	public void radiansbuttonActionPerformed(ItemEvent ie) {
+	    if (ie.getStateChange() == ItemEvent.SELECTED) {
+	    	unit = Unit.RADIANS;
+	    }
+	}
+	
+	public void degreesbuttonActionPerformed(ItemEvent ie) {
+	    if (ie.getStateChange() == ItemEvent.SELECTED) {
+	    	unit = Unit.DEGREES;
+	    }
+	}
 	
 	public void keyTyped(KeyEvent arg0) {
 	
@@ -1110,10 +1163,12 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 	public void mouseMoved(MouseEvent arg0) {
 		
 		Point p=arg0.getPoint();
-		if(VISUALIZATION_STATE==CARTESIAN2D_STATE || VISUALIZATION_STATE==POLAR2D_STATE )
-		   screenPoint.setText(calc.invertX((int)p.getX())+" ; "+calc.invertY((int)p.getY(),HEIGHT));
-		else
-			screenPoint.setText("");	
+		if(calc != null && screenPoint != null){
+			if(VISUALIZATION_STATE==CARTESIAN2D_STATE || VISUALIZATION_STATE==POLAR2D_STATE )
+			   screenPoint.setText(calc.invertX((int)p.getX())+" ; "+calc.invertY((int)p.getY(),HEIGHT));
+			else
+				screenPoint.setText("");	
+		}
 	}
 
 
@@ -1140,6 +1195,29 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		Object obj = arg0.getSource();
 
 		
+	}
+
+	public void itemStateChanged(ItemEvent ie) {
+		if(ie.getItem() instanceof JRadioButton && 
+				ie.getStateChange() == ItemEvent.SELECTED) {
+			JRadioButton rb = (JRadioButton)ie.getItem();
+			if(rb.getText().equals("Radians")) {
+				unit = Unit.RADIANS;
+				jmt4.setVisible(true);
+				jmt3.setVisible(true);
+				displayDerivative.setVisible(true);
+				calculateIntegral.setVisible(true);
+				draw();
+			}
+			else if(rb.getText().equals("Degrees")) {
+				unit = Unit.DEGREES;
+				jmt4.setVisible(false);
+				jmt3.setVisible(false);
+				displayDerivative.setVisible(false);
+				calculateIntegral.setVisible(false);
+				draw();
+			}
+		}
 	}
    
    

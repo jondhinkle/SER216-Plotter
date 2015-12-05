@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.main.Visualizer;
 import com.maths.GraphingCalculator;
+import com.maths.MathTree.Unit;
 
 public class GraphingCalculatorTest {
 	
@@ -56,28 +57,32 @@ public class GraphingCalculatorTest {
 	
 	@Test
 	public void test2DF(){
-		calc.DISPLAYED_FUNCTION = "sin(tan(x))^2+7/1.3-sqrt(25)*cos(x)";
-		double fresult = calc.f(2);
-		assertEquals(0.39146,fresult,0.0001);
+		calc.setFunctionString("sin(tan(x))^2+7.0/1.3-sqrt(25)*cos(x)");
+		double fresult = calc.f(2,Unit.DEGREES);
+		assertEquals(0.3876,fresult,0.0001);
+		fresult = calc.f(2,Unit.RADIANS);
+		assertEquals(8.1331,fresult,0.0001);
 	}
 	
 	@Test(expected = NumberFormatException.class)
 	public void test2DFNull(){
-		calc.DISPLAYED_FUNCTION = "sin(x) +$&";
-		calc.f(1);
+		calc.setFunctionString("sin(x) +$&");
+		calc.f(1,Unit.DEGREES);
 	}
 	
 	@Test
 	public void test3DF(){
-		calc.DISPLAYED_FUNCTION = "sin(tan(x))^2+7/1.3-sqrt(25)*cos(y)";
-		double fresult = calc.f(4,2);
-		assertEquals(0.38766,fresult,0.0001);
+		calc.setFunctionString("sin(x)^2+7/1.3-sqrt(25)+cos(y)");
+		double fresult = calc.f(4,2,Unit.DEGREES);
+		assertEquals(1.3888,fresult,0.0001);
+		fresult = calc.f(4,2,Unit.RADIANS);
+		assertEquals(0.5412,fresult,0.0001);
 	}
 	
 	@Test(expected = NumberFormatException.class)
 	public void test3DFNull(){
-		calc.DISPLAYED_FUNCTION = "sin(x) +$&y";
-		calc.f(2,7);
+		calc.setFunctionString("sin(x) +$&y");
+		calc.f(2,7,Unit.DEGREES);
 	}
 
 }

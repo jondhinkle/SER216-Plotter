@@ -30,17 +30,26 @@ public class DigitTextField extends JTextField{
 			}
 			char[] upper = str.toCharArray();
 			boolean isDigit=true;
+			boolean additionalDecimal = false;
 			
 			for (int i = 0; i < upper.length; i++) {
 				upper[i] = Character.toUpperCase(upper[i]);
 				if(!Character.isDigit(upper[i]) && upper[i]!='.' && upper[i]!='-')
-					{
+				{
 					isDigit=false;
 					break;
 				}
-			
+				else{
+					if(upper[i] == '.'){
+						String text = super.getText(0, super.getLength());
+						if(text.indexOf('.') != -1){
+							additionalDecimal = true;
+							break;
+						}
+					}
+				}
 			}
-			if(isDigit)
+			if(isDigit && !additionalDecimal)
 				super.insertString(offs, new String(upper), a);
 		}
 	}

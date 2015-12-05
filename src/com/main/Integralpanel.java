@@ -19,7 +19,7 @@ import com.maths.GraphingCalculator;
 
 public class Integralpanel extends JDialog implements ActionListener{
 
-	GraphingCalculator calc=null;
+	AdvancedGraphingCalculator calc=null;
 	JTextField result=null;
     JPanel pan=null;
 	private DigitTextField displayedA;
@@ -32,7 +32,7 @@ public class Integralpanel extends JDialog implements ActionListener{
 	
 	
 	
-	public Integralpanel(GraphingCalculator calc) throws HeadlessException {
+	public Integralpanel(AdvancedGraphingCalculator calc) throws HeadlessException {
 		
 		setBounds(30,30,200,230);
 		setTitle("Integral");
@@ -93,8 +93,7 @@ public class Integralpanel extends JDialog implements ActionListener{
 		recalculate.setBounds(5,r,140,20);
 		recalculate.addActionListener(this);
 		pan.add(recalculate);
-
-		calculateIntegral(calc);
+		
 		this.calc = calc;
 
 		add(pan);
@@ -106,19 +105,18 @@ public class Integralpanel extends JDialog implements ActionListener{
 
 
 	/**
-	 * @param calc2
+	 *
 	 */
-	private void calculateIntegral(GraphingCalculator calc2) {
+	private void calculateIntegral() {
 		double val=0;
 		if(types.isSelected())
-			val=AdvancedGraphingCalculator.SimpsonIntegral(calc2);
+			val=calc.SimpsonIntegral();
 		else if(typet.isSelected())
-			val=AdvancedGraphingCalculator.trapeziumIntegral(calc2);
-		else if(typeg.isSelected())
-			val=AdvancedGraphingCalculator.gaussIntegral(calc2);
+			val=calc.trapeziumIntegral();
+			val=calc.gaussIntegral();
 
-		displayedA.setText(""+calc2.a);
-		displayedB.setText(""+calc2.b);
+		displayedA.setText(""+calc.a);
+		displayedB.setText(""+calc.b);
 
         
 		result.setText(""+df.format(val));
@@ -144,6 +142,6 @@ public class Integralpanel extends JDialog implements ActionListener{
 	private void recalculate() {
 		calc.a=Double.parseDouble(displayedA.getText());
 		calc.b=Double.parseDouble(displayedB.getText());
-		calculateIntegral(calc);
+		calculateIntegral();
 	}
 }

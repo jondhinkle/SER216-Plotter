@@ -22,6 +22,10 @@ public class MathTree {
 	public String X_LABEL="X";
 	public String Y_LABEL="Y";
 	public String TETA_LABEL="TETA";
+	public enum Unit {
+		RADIANS,
+		DEGREES
+	}
 
 	public String[] FUNCTIONS={"","SQRT","SIN","COS","TAN","EXP","LOG","LN","ABS","ASIN","ACOS","ATAN","SINH","COSH","TANH"};
 
@@ -34,7 +38,7 @@ public class MathTree {
 
 		te.buildStringTree(words);
 		te.printTree();
-		double sum=te.evaluate(2,1);
+		double sum=te.evaluate(2,1,Unit.RADIANS);
 
 		System.out.println(sum);
 	}
@@ -49,17 +53,19 @@ public class MathTree {
 	public MathTree(String words) {
 		buildStringTree(words);
 	}
-
-	public double evaluate(double x,double y) {
-
-		double sum=evaluate(root,x,y);	
-
-		
-
+	
+	public double evaluate(double x, double y) {
+		double sum = evaluate(x, y, Unit.RADIANS);
 		return sum;
 	}
 
-	public double evaluate(TNode node,double x,double y) {
+	public double evaluate(double x,double y, Unit unit) {
+
+		double sum=evaluate(root,x,y, unit);	
+		return sum;
+	}
+
+	public double evaluate(TNode node,double x,double y, Unit unit) {
 
 
 		double val=0;
@@ -70,12 +76,17 @@ public class MathTree {
 			if(value==null || value.equals(""))
 				return 0;
 
-			if(value.equals(X_LABEL) || value.equals(TETA_LABEL))
+			if(value.equals(X_LABEL) || value.equals(TETA_LABEL)){
+				if(value.equals(TETA_LABEL) && unit == Unit.DEGREES) {
+					throw new IllegalArgumentException("Degrees not a valid measure for functions involving teta");
+				}
 				return x;
-
-			if(value.equals(Y_LABEL))
+			}
+			
+			if(value.equals(Y_LABEL)) {
 				return y;
-
+			}
+			
 			val= Double.parseDouble(value);
 			return val;
 
@@ -91,33 +102,33 @@ public class MathTree {
 
 				TNode child0 = node.getChildAt(0);
 				TNode child1 = node.getChildAt(1);
-				val=evaluate(child0,x,y)+evaluate(child1,x,y);
+				val=evaluate(child0,x,y,unit)+evaluate(child1,x,y,unit);
 
 			}
 			else if(node.getLabel().equals(SUBTRACTION_LABEL)){
 
 				TNode child0 = node.getChildAt(0);
 				TNode child1 = node.getChildAt(1);
-				val=evaluate(child0,x,y)-evaluate(child1,x,y);
+				val=evaluate(child0,x,y,unit)-evaluate(child1,x,y,unit);
 			}
 			else if(node.getLabel().equals(MULTIPLICATION_LABEL)){
 
 				TNode child0 = node.getChildAt(0);
 				TNode child1 = node.getChildAt(1);
-				val=evaluate(child0,x,y)*evaluate(child1,x,y);
+				val=evaluate(child0,x,y,unit)*evaluate(child1,x,y,unit);
 			}
 			else if(node.getLabel().equals(DIVISION_LABEL)){
 
 				TNode child0 = node.getChildAt(0);
 				TNode child1 = node.getChildAt(1);
-				val=evaluate(child0,x,y)/evaluate(child1,x,y);
+				val=evaluate(child0,x,y,unit)/evaluate(child1,x,y,unit);
 
 			}
 			else if(node.getLabel().equals(POWER_LABEL)){
 
 				TNode child0 = node.getChildAt(0);
 				TNode child1 = node.getChildAt(1);
-				val=Math.pow(evaluate(child0,x,y),evaluate(child1,x,y));
+				val=Math.pow(evaluate(child0,x,y,unit),evaluate(child1,x,y,unit));
 
 			}
 			else if(node.getLabel().indexOf("F:")==0){
@@ -125,96 +136,75 @@ public class MathTree {
 				String fnz=node.getLabel().substring(node.getLabel().indexOf(":")+1);
 				TNode child0 = node.getChildAt(0);
 
-
 				if(fnz.equals(""))
 				{
-					val=evaluate(child0,x,y);
-
-
+					val=evaluate(child0,x,y,unit);
 				}
 				else if(fnz.equals("SQRT"))
 				{
-					val=Math.sqrt(evaluate(child0,x,y));
-
-
+					val=Math.sqrt(evaluate(child0,x,y,unit));
 				}
 				else if(fnz.equals("SIN"))
 				{
-					val=Math.sin(evaluate(child0,x,y));
-
-
+					val = evaluate(child0,x,y,unit);
+					val = Math.sin(changeUnitIfNeeded(child0,unit,val));
 				}
 				else if(fnz.equals("COS"))
 				{
-					val=Math.cos(evaluate(child0,x,y));
-
-
+					val = evaluate(child0,x,y,unit);
+					val = Math.cos(changeUnitIfNeeded(child0,unit,val));
 				}
 				else if(fnz.equals("TAN"))
 				{
-					val=Math.tan(evaluate(child0,x,y));
-
-
+					val = evaluate(child0,x,y,unit);
+					val = Math.tan(changeUnitIfNeeded(child0,unit,val));
+					System.out.println("tan="+val);
 				}
 				else if(fnz.equals("EXP"))
 				{
-					val=Math.exp(evaluate(child0,x,y));
-
-
+					val=Math.exp(evaluate(child0,x,y,unit));
 				}
 				else if(fnz.equals("LN"))
 				{
-					val=Math.log(evaluate(child0,x,y));
-
-
+					val=Math.log(evaluate(child0,x,y,unit));
 				}
 				else if(fnz.equals("LOG"))
 				{
-					val=Math.log10(evaluate(child0,x,y));
-
-
+					val=Math.log10(evaluate(child0,x,y,unit));
 				}
 				else if(fnz.equals("ABS"))
 				{
-					val=Math.abs(evaluate(child0,x,y));
-
-
+					val=Math.abs(evaluate(child0,x,y,unit));
 				}
 				else if(fnz.equals("ASIN"))
 				{
-					val=Math.asin(evaluate(child0,x,y));
-
-
+					val = evaluate(child0,x,y,unit);
+					val = Math.asin(changeUnitIfNeeded(child0,unit,val));
 				}
 				else if(fnz.equals("ACOS"))
 				{
-					val=Math.acos(evaluate(child0,x,y));
-
-
+					val = evaluate(child0,x,y,unit);
+					val = Math.acos(changeUnitIfNeeded(child0,unit,val));
 				}
 				else if(fnz.equals("ATAN"))
 				{
-					val=Math.atan(evaluate(child0,x,y));
-
-
+					val = evaluate(child0,x,y,unit);
+					val = Math.atan(changeUnitIfNeeded(child0,unit,val));
 				}
 				else if(fnz.equals("SINH"))
 				{
-					val=Math.sinh(evaluate(child0,x,y));
-
-
+					val = evaluate(child0,x,y,unit);
+					val = Math.sinh(changeUnitIfNeeded(child0,unit,val));
 				}
 				else if(fnz.equals("COSH"))
 				{
-					val=Math.cosh(evaluate(child0,x,y));
-
-
+					val = evaluate(child0,x,y,unit);
+					val = Math.cosh(changeUnitIfNeeded(child0,unit,val));
 				}
 				else if(fnz.equals("TANH"))
 				{
-					val=Math.tanh(evaluate(child0,x,y));
-
-
+					val = evaluate(child0,x,y,unit);
+					val = Math.tanh(changeUnitIfNeeded(child0,unit,val));
 				}
 
 			}
@@ -222,6 +212,12 @@ public class MathTree {
 		}
 		return val;
 
+	}
+	
+	private double changeUnitIfNeeded(TNode node, Unit unit, double x) {
+		if(unit == Unit.DEGREES) return x*0.0174533;
+		return x;
+			
 	}
 
 	public void printTree() {

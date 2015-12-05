@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import com.main.Visualizer;
 import com.maths.GraphingCalculator;
+import com.maths.MathTree;
+import com.maths.MathTree.Unit;
 
 import test.integrationtest.Tools.Tools;
 
@@ -36,39 +38,38 @@ public class GraphingCalculatorTest {
 	}
 	
 	@Test
-	public void testDraw() {
-		calc.DISPLAYED_FUNCTION = "sin(x)";
-		calc.draw();
-		Tools.saveImageToFile(buf, testdir+"draw\\", "Actual.jpg");
+	public void testDrawDeg() {
+		calc.setFunctionString("sin(x)");
+		calc.draw(Unit.DEGREES);
+		Tools.saveImageToFile(buf, testdir+"draw\\deg\\", "Actual.jpg");
 	}
 	
 	@Test
-	public void testDrawDerivative() {
-		calc.DISPLAYED_FUNCTION = "sin(x)";
-		calc.drawDerivative(false);
-		Tools.saveImageToFile(buf, testdir+"drawDerivative\\", "Actual.jpg");
-	}
-	
-	@Test
-	public void testDrawandDrawDerivative() {
-		calc.DISPLAYED_FUNCTION = "sin(x)";
-		calc.draw();
-		calc.drawDerivative(true);
-		Tools.saveImageToFile(buf, testdir+"draw_and_drawDerivative\\", "Actual.jpg");
+	public void testDrawRad() {
+		calc.setFunctionString("sin(x)");
+		calc.draw(Unit.RADIANS);
+		Tools.saveImageToFile(buf, testdir+"draw\\rad\\", "Actual.jpg");
 	}
 	
 	@Test
 	public void testDrawPolar() {
-		calc.DISPLAYED_FUNCTION = "teta-2";
+		calc.setFunctionString("teta-2");
 		calc.drawPolar();
 		Tools.saveImageToFile(buf, testdir+"drawPolar\\", "Actual.jpg");
 	}
 	
 	@Test
-	public void testDraw3D() {
-		calc.DISPLAYED_FUNCTION = "sin(x)+cos(y)";
-		calc.draw3D();
-		Tools.saveImageToFile(buf, testdir+"draw3D\\", "Actual.jpg");
+	public void testDraw3DRad() {
+		calc.setFunctionString("sin(x)+cos(y)");
+		calc.draw3D(Unit.RADIANS);
+		Tools.saveImageToFile(buf, testdir+"draw3D\\rad\\", "Actual.jpg");
+	}
+	
+	@Test
+	public void testDraw3DDeg() {
+		calc.setFunctionString("sin(x)+cos(y)");
+		calc.draw3D(Unit.DEGREES);
+		Tools.saveImageToFile(buf, testdir+"draw3D\\deg\\", "Actual.jpg");
 	}
 	
 }

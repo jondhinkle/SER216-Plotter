@@ -12,16 +12,21 @@ import org.junit.Test;
 import com.main.Visualizer;
 import com.maths.AdvancedGraphingCalculator;
 import com.maths.GraphingCalculator;
+import com.maths.MathTree.Unit;
+
+import test.integrationtest.Tools.Tools;
 
 public class AdvancedGraphingCalculatorTest {
 	
-	private GraphingCalculator calc;
+	private AdvancedGraphingCalculator calc;
+	private BufferedImage buf;
+	public String testdir = "\\IntegrationTest\\GraphingCalculator\\Level1\\";
 	
 	@Before
 	public void setUp(){
-		BufferedImage buf = new BufferedImage(Visualizer.WIDTH,Visualizer.HEIGHT,BufferedImage.TYPE_INT_RGB);
+		buf = new BufferedImage(Visualizer.WIDTH,Visualizer.HEIGHT,BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2d = (Graphics2D)buf.getGraphics();
-		calc = new GraphingCalculator(g2d,Visualizer.WIDTH,Visualizer.HEIGHT);
+		calc = new AdvancedGraphingCalculator(g2d,Visualizer.WIDTH,Visualizer.HEIGHT);
 	}
 	
 	@After
@@ -31,29 +36,44 @@ public class AdvancedGraphingCalculatorTest {
 	
 	@Test
 	public void testDF() {
-		calc.DISPLAYED_FUNCTION = "4x^2";
-		double dfreturn = AdvancedGraphingCalculator.df(2,calc);
+		calc.setFunctionString("4x^2");
+		double dfreturn = calc.df(2);
 		assertEquals(16.0,dfreturn,0.0001);
 	}
 	
 	@Test(expected = NullPointerException.class)
 	public void testDFNull() {
-		AdvancedGraphingCalculator.df(2,null);
+		calc.df(2);
 		fail();
 	}
 	
 	@Test
 	public void testSimpsonIntegral() {
-		calc.DISPLAYED_FUNCTION = "(2*x^3)/(7+x)";
-		double sireturn = AdvancedGraphingCalculator.SimpsonIntegral(calc);
+		calc.setFunctionString("(2*x^3)/(7+x)");
+		double sireturn = calc.SimpsonIntegral();
 		assertEquals(4.32099,sireturn,0.0001);
 	}
 	
 	@Test
 	public void testTrapeziumIntegral() {
-		calc.DISPLAYED_FUNCTION = "1+sin^3(x)";
-		double sireturn = AdvancedGraphingCalculator.SimpsonIntegral(calc);
+		calc.setFunctionString("1+sin^3(x)");
+		double sireturn = calc.SimpsonIntegral();
 		assertEquals(4.18347,sireturn,0.0001);
+	}
+	
+	@Test
+	public void testDrawDerivative() {
+		calc.setFunctionString("sin(x)");
+		calc.drawDerivative();
+		Tools.saveImageToFile(buf, testdir+"drawDerivative\\", "Actual.jpg");
+	}
+	
+	@Test
+	public void testDrawandDrawDerivative() {
+		calc.setFunctionString("sin(x)");
+		calc.draw(Unit.RADIANS);
+		calc.drawDerivative();
+		Tools.saveImageToFile(buf, testdir+"draw_and_drawDerivative\\", "Actual.jpg");
 	}
 	
 }
