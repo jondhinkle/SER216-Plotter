@@ -18,7 +18,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -39,6 +38,7 @@ import javax.swing.JTextField;
 import javax.swing.RepaintManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.maths.AdvancedGraphingCalculator;
 import com.maths.MathTree;
@@ -81,11 +81,10 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 	private JPanel up;
 	
 	public static Color LINE_COLOR=Color.BLUE;
-	public static Color LINE_2_COLOR=Color.GREEN;
-	public static Color LINE_3D_COLOR=Color.LIGHT_GRAY;
+	public static Color DERIVATIVE_LINE_COLOR=Color.GREEN;
 	public static Color AXIS_COLOR=Color.BLACK;
-	public static Color BACKGROUND_COLOR=new Color(	255,236,139);
-	public static Color PANEL_COLOR=new Color(	205,190,112);
+	public static Color GRAPH_COLOR=new Color(	255,236,139);
+	public static Color WINDOW_COLOR=new Color(	205,190,112);
 	private JButton displayDerivative;
 	public static boolean isDerivativeDisplay;
 	private JRadioButton degreesradio;
@@ -114,7 +113,6 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 	private int xPressed;
 	private int yPressed;
 	private File currentDirectory=null;
-	private BufferedImage buf=null;
 	private JMenuItem jmt42;
 	
 	
@@ -157,7 +155,7 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 			}
 		);
 		setInitColors(p);
-		center.setBackground(BACKGROUND_COLOR);
+		center.setBackground(GRAPH_COLOR);
 	
 	}
 
@@ -184,9 +182,9 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 				build3DRightPanel();
 				buildBottomPanel();
 		}
-		up.setBackground(PANEL_COLOR);
-		bottom.setBackground(PANEL_COLOR);
-		right.setBackground(PANEL_COLOR);
+		up.setBackground(WINDOW_COLOR);
+		bottom.setBackground(WINDOW_COLOR);
+		right.setBackground(WINDOW_COLOR);
 		repaint();
 	}
 
@@ -242,7 +240,7 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		
 		jm4=new JMenu("Save");
 		jm4.addMenuListener(this);
-		jmt41=new JMenuItem("Save image");
+		jmt41=new JMenuItem("Export image");
 		jmt41.addActionListener(this);
 		jm4.add(jmt41);
 		
@@ -342,8 +340,8 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		unitgroup.add(degreesradio);
 		up.add(radiansradio);
 		up.add(degreesradio);
-		radiansradio.setBackground(PANEL_COLOR);
-		degreesradio.setBackground(PANEL_COLOR);
+		radiansradio.setBackground(WINDOW_COLOR);
+		degreesradio.setBackground(WINDOW_COLOR);
 		radiansradio.addItemListener(this);
 		degreesradio.addItemListener(this);
 		
@@ -409,8 +407,8 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 			unitgroup.add(degreesradio);
 			up.add(radiansradio);
 			up.add(degreesradio);
-			radiansradio.setBackground(PANEL_COLOR);
-			degreesradio.setBackground(PANEL_COLOR);
+			radiansradio.setBackground(WINDOW_COLOR);
+			degreesradio.setBackground(WINDOW_COLOR);
 			radiansradio.addItemListener(this);
 			degreesradio.addItemListener(this);
 			
@@ -573,10 +571,10 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 			
 			readRange();
 
-			calc.setBackgroundColor(BACKGROUND_COLOR);
+			calc.setBackgroundColor(GRAPH_COLOR);
 			calc.setAxisColor(AXIS_COLOR);
 			calc.setLineColor(LINE_COLOR);
-			calc.setDerivativeColor(LINE_2_COLOR);
+			calc.setDerivativeColor(DERIVATIVE_LINE_COLOR);
 			
 			if(VISUALIZATION_STATE==CARTESIAN2D_STATE){
 				calc.draw(unit);
@@ -766,7 +764,7 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		}
 		else if(o==jmt41){
 			
-			saveImage();
+			exportImage();
 		}
 		else if(o==jmt42){
 			
@@ -786,9 +784,10 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 
 
 
-	private void saveImage() {
+	private void exportImage() {
 		
-		
+		fc.setFileFilter(new FileNameExtensionFilter("PNG","png"));
+		fc.setFileFilter(new FileNameExtensionFilter("JPEG","jpg"));
 		fc.setDialogType(JFileChooser.SAVE_DIALOG);
 		if(currentDirectory!=null)
 			fc.setCurrentDirectory(currentDirectory);
@@ -799,20 +798,35 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 			
 			currentDirectory=fc.getCurrentDirectory();
 			File file = fc.getSelectedFile();
-			saveImage(file);
+			if(fc.getFileFilter().getDescription().equals("JPEG")){
+				if(!file.getName().endsWith(".jpg")) {
+					file = new File(file.getAbsolutePath()+".jpg");
+				}
+				saveImage(file,"jpg");
+			}
+			else if(fc.getFileFilter().getDescription().equals("PNG")){
+				if(!file.getName().endsWith(".png")) {
+					file = new File(file.getAbsolutePath()+".png");
+				}
+				saveImage(file,"png");
+			}
 			
 		} 
+		fc.resetChoosableFileFilters();
 		
 		
 	}
 	
-	private void saveImage(File file) {
+	private void saveImage(File file, String fileext) {
 		
 		//drawFace();
 	
 		try {
 			draw();
-			ImageIO.write(calc.getBufferedImage(),"jpg",file);
+			if(fileext.equals("jpg"))
+				ImageIO.write(calc.getBufferedImage(),"jpg",file);
+			else if(fileext.equals("png"))
+				ImageIO.write(calc.getBufferedImage(),"png",file);
 			
 		} catch (Exception e) {
 			
@@ -834,7 +848,7 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 			
 		}
 		
-		ExportDataPanel edp=new ExportDataPanel(fun);
+		new ExportDataPanel(fun);
 		
 		
 	}
@@ -846,7 +860,7 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 	 */
 	private void selectColors() {
 		
-		Colorpanel cp=new Colorpanel(p);
+		new Colorpanel(p);
 		setColors(p);
 		
 		
@@ -858,30 +872,30 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		
 		setInitColors(p2);
 		
-		center.setBackground(BACKGROUND_COLOR);
-		up.setBackground(PANEL_COLOR);
-		bottom.setBackground(PANEL_COLOR);
-		right.setBackground(PANEL_COLOR);
+		center.setBackground(GRAPH_COLOR);
+		up.setBackground(WINDOW_COLOR);
+		bottom.setBackground(WINDOW_COLOR);
+		right.setBackground(WINDOW_COLOR);
 		
 		repaint();
 	}
 	
 	private void setInitColors(Properties p2) {
 
-		if(p2.getProperty("BACKGROUND_COLOR")!=null){
-			BACKGROUND_COLOR=Colorpanel.buildColor(p2.getProperty("BACKGROUND_COLOR"));
+		if(p2.getProperty("GRAPH_COLOR")!=null){
+			GRAPH_COLOR=Colorpanel.buildColor(p2.getProperty("GRAPH_COLOR"));
 
 		}
 		else{
-			p2.setProperty("BACKGROUND_COLOR",Colorpanel.decomposeColor(BACKGROUND_COLOR));
+			p2.setProperty("GRAPH_COLOR",Colorpanel.decomposeColor(GRAPH_COLOR));
 		}
 		
-		if(p2.getProperty("PANEL_COLOR")!=null){
-			PANEL_COLOR=Colorpanel.buildColor(p2.getProperty("PANEL_COLOR"));
+		if(p2.getProperty("WINDOW_COLOR")!=null){
+			WINDOW_COLOR=Colorpanel.buildColor(p2.getProperty("WINDOW_COLOR"));
 
 		}
 		else{
-			p2.setProperty("PANEL_COLOR",Colorpanel.decomposeColor(PANEL_COLOR));
+			p2.setProperty("WINDOW_COLOR",Colorpanel.decomposeColor(WINDOW_COLOR));
 		}
 		
 		if(p2.getProperty("LINE_COLOR")!=null){
@@ -892,12 +906,12 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 			p2.setProperty("LINE_COLOR",Colorpanel.decomposeColor(LINE_COLOR));
 		}
 		
-		if(p2.getProperty("LINE_2_COLOR")!=null){
-			LINE_2_COLOR=Colorpanel.buildColor(p2.getProperty("LINE_2_COLOR"));
+		if(p2.getProperty("DERIVATIVE_LINE_COLOR")!=null){
+			DERIVATIVE_LINE_COLOR=Colorpanel.buildColor(p2.getProperty("DERIVATIVE_LINE_COLOR"));
 
 		}
 		else{
-			p2.setProperty("LINE_2_COLOR",Colorpanel.decomposeColor(LINE_2_COLOR));
+			p2.setProperty("DERIVATIVE_LINE_COLOR",Colorpanel.decomposeColor(DERIVATIVE_LINE_COLOR));
 		}
 		if(p2.getProperty("AXIS_COLOR")!=null){
 			AXIS_COLOR=Colorpanel.buildColor(p2.getProperty("AXIS_COLOR"));
@@ -905,13 +919,6 @@ public class Visualizer extends JFrame implements ActionListener,KeyListener,
 		}
 		else{
 			p2.setProperty("AXIS_COLOR",Colorpanel.decomposeColor(AXIS_COLOR));
-		}
-		
-		if(p2.getProperty("LINE_3D_COLOR")!=null){
-			LINE_3D_COLOR=Colorpanel.buildColor(p2.getProperty("LINE_3D_COLOR"));
-		}
-		else{
-			p2.setProperty("LINE_3D_COLOR",Colorpanel.decomposeColor(LINE_3D_COLOR));
 		}
 
 	}

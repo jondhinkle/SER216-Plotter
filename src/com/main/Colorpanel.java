@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
@@ -23,7 +24,7 @@ public class Colorpanel extends JDialog implements ActionListener{
 	private JPanel pan;
 	private JButton save=null;
 	private Properties p=null;
-	int numPanels=6;
+	int numPanels=5;
 	ColorChoose[] selects=new ColorChoose[numPanels];
 	private Component THIS;
 	
@@ -40,45 +41,40 @@ public class Colorpanel extends JDialog implements ActionListener{
 		
 		pan=new JPanel();
 		pan.setLayout(null);
-        pan.setBackground(Visualizer.BACKGROUND_COLOR);
+        pan.setBackground(Visualizer.GRAPH_COLOR);
         
         save=new JButton("Save");
         save.addActionListener(this);
         
         int r=10;
         
-        selects[0]=new ColorChoose("BACKGROUND_COLOR",p.getProperty("BACKGROUND_COLOR"));
-        selects[0].setBounds(10,r,350,50);
-        pan.add(selects[0]);
-		
-        r+=60;
-		
-		selects[1]=new ColorChoose("PANEL_COLOR",p.getProperty("PANEL_COLOR"));
-		selects[1].setBounds(10,r,350,50);
-		pan.add(selects[1]);
+        selects[0]=new ColorChoose("WINDOW_COLOR",p.getProperty("WINDOW_COLOR"));
+		selects[0].setBounds(10,r,350,50);
+		pan.add(selects[0]);
 		
 		r+=60;
-		
-		selects[2]=new ColorChoose("LINE_COLOR",p.getProperty("LINE_COLOR"));
+        
+        selects[1]=new ColorChoose("GRAPH_COLOR",p.getProperty("GRAPH_COLOR"));
+        selects[1].setBounds(10,r,350,50);
+        pan.add(selects[1]);
+        
+        r+=60;
+        
+        selects[2]=new ColorChoose("AXIS_COLOR",p.getProperty("AXIS_COLOR"));
 		selects[2].setBounds(10,r,350,50);
 		pan.add(selects[2]);
 		
-		r+=60;
+        r+=60;
 		
-		selects[3]=new ColorChoose("LINE_2_COLOR",p.getProperty("LINE_2_COLOR"));
+		selects[3]=new ColorChoose("LINE_COLOR",p.getProperty("LINE_COLOR"));
 		selects[3].setBounds(10,r,350,50);
 		pan.add(selects[3]);
+		
 		r+=60;
 		
-		selects[4]=new ColorChoose("AXIS_COLOR",p.getProperty("AXIS_COLOR"));
+		selects[4]=new ColorChoose("DERIVATIVE_LINE_COLOR",p.getProperty("DERIVATIVE_LINE_COLOR"));
 		selects[4].setBounds(10,r,350,50);
 		pan.add(selects[4]);
-		
-		r+=60;
-		
-		selects[5]=new ColorChoose("LINE_3D_COLOR",p.getProperty("LINE_3D_COLOR"));
-		selects[5].setBounds(10,r,350,50);
-		pan.add(selects[5]);
 		
 		
 		save.setBounds(10,r+50,80,20);
@@ -127,7 +123,7 @@ public class Colorpanel extends JDialog implements ActionListener{
 		String value=null;
 		
 		
-		JTextField textvalue=null;
+		JPanel colorreppanel=null;
 		JButton cho=null;
 		JLabel lab=null;
 		
@@ -140,7 +136,8 @@ public class Colorpanel extends JDialog implements ActionListener{
 			
 			setLayout(null);
 			setOpaque(false);
-			textvalue=new JTextField(10);
+			colorreppanel=new JPanel();
+			colorreppanel.setBorder(BorderFactory.createLineBorder(Color.black));
 			
 			cho=new JButton(">");
 			cho.addActionListener(
@@ -151,19 +148,17 @@ public class Colorpanel extends JDialog implements ActionListener{
                           if(tcc!=null) writeColor(tcc);
 
 						}
-
-					
 					}
 			);
 			
-			lab=new JLabel(property);
-			textvalue.setBackground(buildColor(value));
+			lab=new JLabel(property,JLabel.RIGHT);
+			colorreppanel.setBackground(buildColor(value));
 			lab.setBounds(0,0,150,20);
-			textvalue.setBounds(160,0,100,20);
+			colorreppanel.setBounds(160,0,100,20);
 			cho.setBounds(290,0,50,20);
 			
 			add(lab);
-			add(textvalue);
+			add(colorreppanel);
 			add(cho);
 			
 
@@ -171,7 +166,7 @@ public class Colorpanel extends JDialog implements ActionListener{
 		
 		private void writeColor(Color tcc) {
 			value=decomposeColor(tcc);
-			textvalue.setBackground(buildColor(value));
+			colorreppanel.setBackground(buildColor(value));
 			
 		}
 

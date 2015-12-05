@@ -1,4 +1,4 @@
-package test.integrationtest.Level1;
+package test.integrationtest.Level3;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

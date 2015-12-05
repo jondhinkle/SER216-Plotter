@@ -7,7 +7,6 @@ import javax.swing.text.PlainDocument;
 
 
 public class FunctionTextField extends JTextField{
-
 	
 	public FunctionTextField(int cols) {
 		super(cols);

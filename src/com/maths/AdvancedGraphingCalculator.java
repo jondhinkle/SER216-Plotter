@@ -137,9 +137,6 @@ public class AdvancedGraphingCalculator extends GraphingCalculator{
 				if(cy<height && cx<width && cx>=0 && cy>=0)
 					getGraphics2D().drawOval(cx,height-cy,1,1);
 			  } 
-		
-		  	  
-		drawToExternalGraphics2D();
 	}
 	
 	private double[] calculateDerivativeFunction() {

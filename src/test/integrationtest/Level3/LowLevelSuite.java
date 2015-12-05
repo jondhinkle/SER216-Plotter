@@ -1,4 +1,4 @@
-package test.integrationtest.Level1;
+package test.integrationtest.Level3;
 
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;

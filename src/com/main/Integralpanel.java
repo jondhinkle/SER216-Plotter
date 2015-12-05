@@ -38,7 +38,7 @@ public class Integralpanel extends JDialog implements ActionListener{
 		setTitle("Integral");
 		pan=new JPanel();
 		pan.setLayout(null);
-        pan. setBackground(Visualizer.BACKGROUND_COLOR);
+        pan. setBackground(Visualizer.GRAPH_COLOR);
 		//setSize(200,500);
 
         int r=30;
@@ -46,7 +46,7 @@ public class Integralpanel extends JDialog implements ActionListener{
         JLabel rlabel = new JLabel("Calculated range:");
 		rlabel.setBounds(5,10,100,20);
 		pan.add(rlabel);
-		JLabel alabel = new JLabel("x1:");
+		JLabel alabel = new JLabel("a:");
 		alabel.setBounds(5,r,20,20);
 		pan.add(alabel);
 		displayedA=new DigitTextField();
@@ -54,7 +54,7 @@ public class Integralpanel extends JDialog implements ActionListener{
 		displayedA.setBounds(35,r,80,20);
 		pan.add(displayedA);
 		r+=20;
-		JLabel blabel = new JLabel("x2:");
+		JLabel blabel = new JLabel("b:");
 		blabel.setBounds(5,r,20,20);
 		pan.add(blabel);
 		displayedB=new DigitTextField();
@@ -117,7 +117,7 @@ public class Integralpanel extends JDialog implements ActionListener{
 
 		displayedA.setText(""+calc.a);
 		displayedB.setText(""+calc.b);
-
+		
         
 		result.setText(""+df.format(val));
 		

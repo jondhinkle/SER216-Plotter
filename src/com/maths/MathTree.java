@@ -158,7 +158,6 @@ public class MathTree {
 				{
 					val = evaluate(child0,x,y,unit);
 					val = Math.tan(changeUnitIfNeeded(child0,unit,val));
-					System.out.println("tan="+val);
 				}
 				else if(fnz.equals("EXP"))
 				{

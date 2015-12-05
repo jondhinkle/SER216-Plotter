@@ -1,4 +1,4 @@
-package test.integrationtest.Level1;
+package test.integrationtest.Level3;
 
 import static org.junit.Assert.*;
 

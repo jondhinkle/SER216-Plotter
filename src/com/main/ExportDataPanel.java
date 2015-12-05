@@ -44,7 +44,7 @@ public class ExportDataPanel extends JDialog implements ActionListener{
 		
 		pan=new JPanel();
 		pan.setLayout(null);
-        pan.setBackground(Visualizer.BACKGROUND_COLOR);
+        pan.setBackground(Visualizer.GRAPH_COLOR);
                 
         int r=10;
         
